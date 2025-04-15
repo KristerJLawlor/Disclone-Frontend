@@ -12,21 +12,28 @@ import HeadsetIcon from '@material-ui/icons/Headset'
 import SettingsIcon from '@material-ui/icons/Settings'
 import { useSelector } from 'react-redux'
 import { selectUser } from './features/userSlice'
-import db, { auth } from './firebase'
+import { auth, db } from './firebase'
 import { useState } from 'react'
 import { useEffect } from 'react'
+import axios from './axios'
+
 
 const Sidebar = () => {
     const user = useSelector(selectUser)
     const [channels, setChannels] = useState([])
 
+    //download all channel data from the database
+    const getChannels = () => {
+        axios.get('/get/channelList')
+            .then((res) => {
+                console.log(res.data)
+                setChannels(res.data)
+            })
+        }
+
+    // will call getChannels when app loads
     useEffect(() => {
-        db.collection('channels').onSnapshot(snapshot => {
-            setChannels(snapshot.docs.map(doc => ({
-                id: doc.id,
-                channel: doc.data()
-            })))
-        })
+        getChannels(); 
     }, [])
 
     const handleAddChannel = (e) => {
@@ -60,8 +67,8 @@ const Sidebar = () => {
                 </div>
                 <div className="sidebar__channelsList">
                     {
-                        channels.map(({ id, channel }) => (
-                            <SidebarChannel key={id} id={id} channelName={channel.channelName} />
+                        channels.map(channel => (
+                            <SidebarChannel key={channel.id} id={channel.id} channelName={channel.channelName} />
                         ))
                     }
                 </div>

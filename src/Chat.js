@@ -11,8 +11,9 @@ import { selectUser } from './features/userSlice'
 import { selectChannelId, selectChannelName } from './features/appSlice'
 import { useState } from 'react'
 import { useEffect } from 'react'
-import db from './firebase'
-import firebase from 'firebase'
+import {db} from './firebase'
+import firebase from 'firebase/compat/app'
+import axios from './axios'
 
 const Chat = () => {
     const user = useSelector(selectUser)
@@ -20,6 +21,14 @@ const Chat = () => {
     const channelName = useSelector(selectChannelName)
     const [input, setInput] = useState('')
     const [messages, setMessages] = useState([])
+
+    const getConversationId = (channelId) => {
+        if (channelId) {
+            axios.get('/get/conversationId?id=${channelId}').then((res) => {
+                setMessages(res.data[0].conversation)
+            })
+        }
+    }
 
     useEffect(() => {
         if (channelId) {

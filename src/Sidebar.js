@@ -16,6 +16,11 @@ import { auth, db } from './firebase'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import axios from './axios'
+import Pusher from 'pusher-js'
+
+const pusher = new Pusher('4f5c5e9997c6a799cffe', {
+    cluster: 'us3'
+  });
 
 
 const Sidebar = () => {
@@ -41,6 +46,12 @@ const Sidebar = () => {
     useEffect(() => {
         getChannels(); 
         console.log('after getChannels');
+
+        const channel = pusher.subscribe('channels');
+        channel.bind('newChannel', function(data) {
+          getChannels();
+        });
+
     }, [])
 
     const handleAddChannel = (e) => {
@@ -49,7 +60,7 @@ const Sidebar = () => {
         const channelName = prompt('Enter a new channel name')
 
         if (channelName) {
-            db.collection('channels').add({
+            axios.post('/new/channel', {
                 channelName: channelName
             })
 

@@ -24,16 +24,23 @@ const Sidebar = () => {
 
     //download all channel data from the database
     const getChannels = () => {
+        console.log('in getChannels');
+
         axios.get('/get/channelList')
             .then((res) => {
                 console.log(res.data)
                 setChannels(res.data)
             })
+            .catch((err) => {
+                console.log(err)
+                console.warn('Error fetching channels:', err);
+            });
         }
 
     // will call getChannels when app loads
     useEffect(() => {
         getChannels(); 
+        console.log('after getChannels');
     }, [])
 
     const handleAddChannel = (e) => {
@@ -52,7 +59,7 @@ const Sidebar = () => {
     return (
         <div className='sidebar' >
             <div className="sidebar__top">
-                <h3>Clever Programmer</h3>
+                <h3>Disclone Server</h3>
                 <ExpandMoreIcon />
             </div>
 

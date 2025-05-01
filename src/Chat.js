@@ -24,29 +24,25 @@ const Chat = () => {
 
     const getConversationId = (channelId) => {
         if (channelId) {
-            axios.get('/get/conversationId?id=${channelId}').then((res) => {
-                setMessages(res.data[0].conversation)
+            axios.get(`/get/conversation?id=${channelId}`).then((res) => {
+                console.log("data : " + channelId)  //is returning the correct channelId
+                console.log("conversation" + res.data.conversation)
+                setMessages(res.data.conversation)
             })
         }
     }
 
     useEffect(() => {
-        if (channelId) {
-            db.collection('channels').doc(channelId).collection('messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-                setMessages(snapshot.docs.map(doc => doc.data()))
-            })
-        }
-
-
+        getConversationId(channelId);
     }, [channelId])
 
     const sendMessage = (e) => {
         e.preventDefault()
 
-        db.collection('channels').doc(channelId).collection('messages').add({
+        axios.post(`/new/message?id=${channelId}`, {
             message: input,
-            user: user,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            timestamp: Date.now(),
+            user: user
         })
 
         setInput('')
